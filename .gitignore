@@ -69,3 +69,10 @@ public
 
 /NOTES.md
 /RELEASENOTES.md
+
+node_modules
+
+/.cache
+/build
+/public/build
+.env
