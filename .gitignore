@@ -60,7 +60,6 @@ tsconfig.tsbuildinfo
 /scripts/deployment-test/yarn.lock
 
 /.idea/
-public
 
 /playground
 /scripts/playground/template.local
