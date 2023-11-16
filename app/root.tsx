@@ -1,18 +1,19 @@
 import { json } from "@remix-run/node"
+import { useEffect } from "react"
 import {
   Form,
-  Link,
   Links,
   LiveReload,
   Meta,
   Outlet,
+  NavLink,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigation,
 } from "@remix-run/react"
-import type { LinksFunction } from "@remix-run/node"
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node"
 import { getContacts, createEmptyContact } from "./data"
-// existing imports
 
 import appStylesHref from "./app.css"
 
@@ -20,10 +21,11 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
 ]
 
-// existing imports
-export const loader = async () => {
-  const contacts = await getContacts()
-  return json({ contacts })
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url)
+  const q = url.searchParams.get("q")
+  const contacts = await getContacts(q)
+  return json({ contacts, q })
 }
 
 export const action = async () => {
@@ -32,7 +34,15 @@ export const action = async () => {
 }
 
 export default function App() {
-  const { contacts } = useLoaderData<typeof loader>()
+  const { contacts, q } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
+
+  useEffect(() => {
+    const searchField = document.getElementById("q")
+    if (searchField instanceof HTMLInputElement) {
+      searchField.value = q || ""
+    }
+  }, [q])
 
   return (
     <html lang="en">
@@ -43,13 +53,18 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div id="sidebar">
+        <div
+          className={navigation.state === "loading" ? "loading" : ""}
+          id="sidebar"
+        >
           <h1>Remix Contacts</h1>
+
           <div>
             <Form id="search-form" role="search">
               <input
                 id="q"
                 aria-label="Search contacts"
+                defaultValue={q || ""}
                 placeholder="Search"
                 type="search"
                 name="q"
@@ -60,12 +75,18 @@ export default function App() {
               <button type="submit">New</button>
             </Form>
           </div>
+
           <nav>
             {contacts.length ? (
               <ul>
                 {contacts.map((contact) => (
                   <li key={contact.id}>
-                    <Link to={`contacts/${contact.id}`}>
+                    <NavLink
+                      className={({ isActive, isPending }) =>
+                        isActive ? "active" : isPending ? "pending" : ""
+                      }
+                      to={`contacts/${contact.id}`}
+                    >
                       {contact.first || contact.last ? (
                         <>
                           {contact.first} {contact.last}
@@ -74,7 +95,7 @@ export default function App() {
                         <i>No Name</i>
                       )}{" "}
                       {contact.favorite ? <span>★</span> : null}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>

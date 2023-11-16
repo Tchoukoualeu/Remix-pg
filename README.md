@@ -1,6 +1,6 @@
 # Welcome to Remix!
 
-- [Remix Docs](https://remix.run/docs)
+- [Remix Docs](https://remix.run/docs/en/main/start/tutorial#submitting-forms-onchange)
 
 ## Development
 
