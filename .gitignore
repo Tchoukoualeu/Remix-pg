@@ -61,6 +61,8 @@ tsconfig.tsbuildinfo
 
 /.idea/
 
+.cache/
+
 /playground
 /scripts/playground/template.local
 /scripts/playground/template/build
